@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// get one product
+// get one product /api/products/#
 router.get('/:id', async (req, res) => {
   try {
     const productData = await Product.findByPk(req.params.id, {

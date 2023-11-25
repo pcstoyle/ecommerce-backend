@@ -20,7 +20,7 @@ Product.init(
       allowNull: false,
     }, 
     price: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.DECIMAL,
     }, 
     stock: {
       type: DataTypes.INTEGER,
@@ -31,12 +31,13 @@ Product.init(
       references: {
         model: 'category', 
         key: 'id',
-      }
+      },
+      allowNull: false,
     },
   },
   {
     sequelize,
-    timestamps: true,
+    timestamps: false,
     freezeTableName: true,
     underscored: true,
     modelName: 'product',
