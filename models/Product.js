@@ -32,12 +32,11 @@ Product.init(
         model: 'category', 
         key: 'id',
       },
-      allowNull: false,
     },
   },
   {
     sequelize,
-    timestamps: false,
+    timestamps: true,
     freezeTableName: true,
     underscored: true,
     modelName: 'product',

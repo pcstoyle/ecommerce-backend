@@ -28,32 +28,36 @@ router.get('/:id', async (req, res) => {
 });
 
 // create new product
-router.post('/', (req, res) => {
-  Product.create({
-    product_name: req.body.product_name, 
-    price: req.body.price,
-    stock: req.body.stock,
-    tagIds: req.body.tagIds,
-  })
-    .then((product) => {
-      // if there's product tags, we need to create pairings to bulk create in the ProductTag model
-      if (req.body.tagIds.length) {
-        const productTagIdArr = req.body.tagIds.map((tag_id) => {
-          return {
-            product_id: product.id,
-            tag_id,
-          };
-        });
-        return ProductTag.bulkCreate(productTagIdArr);
-      }
-      // if no product tags, just respond
-      res.status(200).json(product);
-    })
-    .then((productTagIds) => res.status(200).json(productTagIds))
-    .catch((err) => {
-      console.log(err);
-      res.status(400).json(err);
+router.post('/', async (req, res) => {
+  try {
+    // Create the product based on the request body
+    const product = await Product.create({
+      product_name: req.body.product_name,
+      price: req.body.price,
+      stock: req.body.stock,
     });
+
+    // Check if tagIds are present in the request body
+    if (req.body.tagIds && req.body.tagIds.length) {
+      // Prepare an array of objects to associate tags with the product
+      const productTagIdArr = req.body.tagIds.map((tag_id) => ({
+        product_id: product.id,
+        tag_id,
+      }));
+
+      // Bulk create associations in the ProductTag model
+      const productTagIds = await ProductTag.bulkCreate(productTagIdArr);
+      
+      // Respond with the created product and associated tag IDs
+      res.status(200).json({ product, productTagIds });
+    } else {
+      // If no tags are provided, respond with just the created product
+      res.status(200).json(product);
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(400).json(err);
+  }
 });
 
 // update product
